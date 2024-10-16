@@ -43,7 +43,7 @@
 ## Installation and Usage
 
   1. **`Clone the project`**:
-     git clone https://github.com/yourusername/git-implementation.git
+     git clone https://github.com/Forquosh/My-Git <your_directory>
      cd git-implementation
   2. **`Run the script`**: Use your_program.sh to run the different Git commands. For example, to initialize a repository:
      ./your_program.sh init
