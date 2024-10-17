@@ -1,6 +1,6 @@
 # My Git Implementation in Python
 
-  This project is a simple Git implementation in Python, built from scratch to demonstrate core functionalities of Git, including cloning a repository, writing objects, creating commits, and more. The code supports several key Git commands and can be expanded upon for learning purposes.
+  This project is a simple Git implementation in Python, built from scratch to demonstrate core functionalities of Git, including cloning a repository, writing objects, creating commits, and more. It was written and tested throughout the "Build your own git" challenge on Codecrafters. The code supports several key Git commands and can be expanded upon for learning purposes.
 
 ## Features
 
