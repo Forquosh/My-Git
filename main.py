@@ -9,19 +9,19 @@ import urllib.request
 from pathlib import Path
 
 
-def create_object(category: str, data, parent=os.getcwd()):
+def create_object(category: str, data, parent=Path(os.getcwd())):
     header = f"{category} {len(data)}\x00"
     content = header.encode() + data
     sha = hashlib.sha1(content).hexdigest()
-    p = Path(parent) / ".git" / "objects" / sha[:2] / sha[2:]
+    p = parent / ".git" / "objects" / sha[:2] / sha[2:]
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_bytes(zlib.compress(content, level=zlib.Z_BEST_SPEED))
     return sha
 
 
-def read_object(sha: str, parent=os.getcwd()):
-    path = f"{parent}/.git/objects/{sha[:2]}/{sha[2:]}"
-    bs = Path(path).read_bytes()
+def read_object(sha: str, parent=Path(os.getcwd())):
+    path = parent / ".git" / "objects" / sha[:2] / sha[2:]
+    bs = path.read_bytes()
     head, content = zlib.decompress(bs).split(b"\0", maxsplit=1)
     tip, _ = head.split(b" ")
     return tip.decode(), content
@@ -145,9 +145,9 @@ def main():
                 bs[1].decode(): bs[0].decode()
                 for bs0 in cast(bytes, f.read()).split(b"\n")
                 if (bs1 := bs0[4:])
-                and not bs1.startswith(b"#")
-                and (bs2 := bs1.split(b"\0")[0])
-                and (bs := (bs2[4:] if bs2.endswith(b"HEAD") else bs2).split(b" "))
+                   and not bs1.startswith(b"#")
+                   and (bs2 := bs1.split(b"\0")[0])
+                   and (bs := (bs2[4:] if bs2.endswith(b"HEAD") else bs2).split(b" "))
             }
 
         # Render references
@@ -176,7 +176,7 @@ def main():
                 break
             pack_lines.append(pack_bytes[4:line_length])
             pack_bytes = pack_bytes[line_length:]
-        pack_file = b"".join(l[1:] for l in pack_lines[1:])
+        pack_file = b"".join(line[1:] for line in pack_lines[1:])
 
         def next_size_and_type(bs: bytes) -> Tuple[str, int, bytes]:
             ty = (bs[0] & 0b_0111_0000) >> 4
@@ -195,6 +195,7 @@ def main():
                     ty = "ref_delta"
                 case _:
                     ty = "unknown"
+
             size = bs[0] & 0b_0000_1111
             index = 1
             off = 4
@@ -225,7 +226,7 @@ def main():
                     dec = zlib.decompressobj()
                     content = dec.decompress(pack_file)
                     pack_file = dec.unused_data
-                    create_object(tip, content, str(parent))
+                    create_object(tip, content, parent)
                 case "ref_delta":
                     obj = pack_file[:20].hex()
                     pack_file = pack_file[20:]
@@ -233,7 +234,7 @@ def main():
                     content = dec.decompress(pack_file)
                     pack_file = dec.unused_data
                     target_content = b""
-                    base_tip, base_content = read_object(obj, str(parent))
+                    base_tip, base_content = read_object(obj, parent)
                     # base and output sizes
                     _, content = next_size(content)
                     _, content = next_size(content)
@@ -258,13 +259,13 @@ def main():
                             append = content[1: size + 1]
                             content = content[size + 1:]
                             target_content += append
-                    create_object(base_tip, target_content, str(parent))
+                    create_object(base_tip, target_content, parent)
                 case _:
                     raise RuntimeError("Not implemented")
 
         def render_tree(parent: Path, directory: Path, sha: str):
             directory.mkdir(parents=True, exist_ok=True)
-            _, tree_data = read_object(sha, str(parent))
+            _, tree_data = read_object(sha, parent)
             while tree_data:
                 mode, tree_data = tree_data.split(b" ", 1)
                 name, tree_data = tree_data.split(b"\0", 1)
@@ -274,12 +275,12 @@ def main():
                     case b"40000":
                         render_tree(parent, directory / name.decode(), sha)
                     case b"100644":
-                        _, content = read_object(sha, str(parent))
+                        _, content = read_object(sha, parent)
                         Path(directory / name.decode()).write_bytes(content)
                     case _:
                         raise RuntimeError("Not implemented")
 
-        _, commit = read_object(refs["HEAD"], str(parent))
+        _, commit = read_object(refs["HEAD"], parent)
         tree_sha = commit[5: 40 + 5].decode()
         render_tree(parent, parent, tree_sha)
 
