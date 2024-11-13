@@ -16,23 +16,23 @@
   
   1. **`init`**: Initialize a new Git repository.
 
-     ./your_program.sh init
+     `./your_program.sh init`
   
   2. **`hash-object -w <file>`**: Write the contents of a file into the .git/objects folder as a blob.
      
-     ./your_program.sh hash-object -w <file>
+     `./your_program.sh hash-object -w <file>`
   
   3. **`write-tree`**: Write a tree object representing the current directory structure.
 
-     ./your_program.sh write-tree
+     `./your_program.sh write-tree`
   
   4. **`commit-tree <tree_sha> -p <commit_sha> -m <message>`**: Create a commit object from a tree object, linking it to a parent commit and adding a message.
      
-     ./your_program.sh commit-tree <tree_sha> -p <commit_sha> -m <message>
+     `./your_program.sh commit-tree <tree_sha> -p <commit_sha> -m <message>`
      
   5. **`clone <repo_url> <directory>`**: Clone a remote Git repository into a specified directory.
      
-     ./your_program.sh clone <repo_url> <directory>
+     `./your_program.sh clone <repo_url> <directory>`
 
 ## How the Code Works
 
@@ -51,15 +51,15 @@
 
 ## Installation and Usage
 
-  1. **`Clone the project`**:
+  1. **Clone the project**:
      
      git clone https://github.com/Forquosh/My-Git <your_directory>
 
-     cd <your_directory>
+     `cd <your_directory>`
      
-  3. **`Run the script`**: Use your_program.sh to run the different Git commands. For example, to initialize a repository:
+  3. **Run the script**: Use your_program.sh to run the different Git commands. For example, to initialize a repository:
      
-     ./your_program.sh init
+     `./your_program.sh init`
 
 ## Requirements
 
@@ -72,4 +72,3 @@
   1. Add support for more Git commands.
   2. Optimize object handling and compression.
   3. Improve error handling and user feedback.
-     
